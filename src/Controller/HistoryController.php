@@ -37,9 +37,13 @@ class HistoryController extends AbstractController
     }
 
     #[Route('/exchange', name: 'app_list', methods: ['post', 'get'])]
-    public function list(EntityManagerInterface $entityManager): JsonResponse
+    public function list(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
-        $histories = $entityManager->getRepository(History::class)->findAll();
+        $page = $request->query->getInt('page', 1);
+        $order = $request->query->get('order');
+        $direction = $request->query->get('direction');
+
+        $histories = $entityManager->getRepository(History::class)->findAllRecords($page, $order, $direction);
         return $this->json(['data' => $histories]);
     }
 }
