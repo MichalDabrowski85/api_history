@@ -14,8 +14,13 @@ class HistoryController extends AbstractController
     #[Route('/exchange/values', name: 'app_exchange_values', methods: ['post'])]
     public function create(EntityManagerInterface $entityManager, Request $request): JsonResponse
     {
-        $first = $request->request->getInt('first');
-        $second = $request->request->getInt('second');
+        $data = json_decode($request->getContent(), true);
+
+        if (!isset($data['first']) || !isset($data['second'])) {
+            return $this->json(['error' => 'Invalid data'], 400);
+        }
+        $first = $data['first'];
+        $second = $data['second'];
 
         $history = new History();
         $history->setFirstIn($first);
@@ -29,5 +34,12 @@ class HistoryController extends AbstractController
         $entityManager->flush();
 
         return $this->json(['message' => 'Done'], 201);
+    }
+
+    #[Route('/exchange', name: 'app_list', methods: ['post', 'get'])]
+    public function list(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $histories = $entityManager->getRepository(History::class)->findAll();
+        return $this->json(['data' => $histories]);
     }
 }
