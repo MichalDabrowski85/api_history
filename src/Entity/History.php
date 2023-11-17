@@ -104,4 +104,9 @@ class History
         $this->updatedAt = new \DateTimeImmutable();
         return $this;
     }
+
+    public function replace(): void
+    {
+        [$this->firstIn, $this->secondIn] = [$this->secondIn, $this->firstIn];
+    }
 }
